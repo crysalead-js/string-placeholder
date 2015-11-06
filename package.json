@@ -1,7 +1,7 @@
 {
   "name": "string-placeholder",
-  "version": "1.0.0",
-  "description": "Replaces placeholders into a string template.",
+  "version": "1.0.1",
+  "description": "Replaces placeholders from string templates.",
   "license": "MIT",
   "repository": {
     "type": "git",
