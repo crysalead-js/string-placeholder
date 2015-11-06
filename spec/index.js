@@ -53,6 +53,15 @@ describe("template()", function() {
 
   });
 
+  it("inserts variables using an array", function() {
+
+    var string = '${0} ${1}';
+    expected = '1 2';
+    var result = t(string, [1, 2]);
+    expect(result).toBe(expected);
+
+  });
+
 });
 
 describe("template.clean()", function() {

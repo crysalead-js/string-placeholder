@@ -35,7 +35,7 @@ function template(str, data, options) {
   var begin = escape ? '(' + escapeRegExp(escape) + ')?' + escapeRegExp(before) : escapeRegExp(before);
   var end = escapeRegExp(after);
 
-  var keys = Array.isArray(data) ? new Array(data.len).map(function (_, i) {return i;}) : Object.keys(data);
+  var keys = Array.isArray(data) ? Array.apply(null, { length: data.length }).map(Number.call, Number) : Object.keys(data);
   var len = keys.length;
 
   for (var i = 0; i < len; i++) {
