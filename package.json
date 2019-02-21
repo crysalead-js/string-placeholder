@@ -1,6 +1,6 @@
 {
   "name": "string-placeholder",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Replaces placeholders from string templates.",
   "license": "MIT",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "http://github.com/crysalead-js/string-placeholder.git"
   },
   "devDependencies": {
-    "jasmine": "^2.3"
+    "jasmine": "^3.3"
   },
   "scripts": {
     "test": "jasmine"
