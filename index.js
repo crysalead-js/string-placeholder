@@ -1,3 +1,5 @@
+var cache = {};
+
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
@@ -27,16 +29,24 @@ function template(str, data, options) {
   var data = data || {};
   var options = options || {};
 
+  var keys = Array.isArray(data) ? Array.apply(null, { length: data.length }).map(Number.call, Number) : Object.keys(data);
+  var len = keys.length;
+
+  if (!len) {
+    return str;
+  }
+
   var before = options.before !== undefined ? options.before : '${';
   var after = options.after !== undefined ? options.after : '}';
   var escape = options.escape !== undefined ? options.escape : '\\';
   var clean = options.clean !== undefined ? options.clean : false;
 
-  var begin = escape ? '(' + escapeRegExp(escape) + ')?' + escapeRegExp(before) : escapeRegExp(before);
-  var end = escapeRegExp(after);
+  cache[escape] = cache[escape] || escapeRegExp(escape);
+  cache[before] = cache[before] || escapeRegExp(before);
+  cache[after] = cache[after] || escapeRegExp(after);
 
-  var keys = Array.isArray(data) ? Array.apply(null, { length: data.length }).map(Number.call, Number) : Object.keys(data);
-  var len = keys.length;
+  var begin = escape ? '(' + cache[escape] + ')?' + cache[before] : cache[before];
+  var end = cache[after];
 
   for (var i = 0; i < len; i++) {
     str = str.replace(new RegExp(begin + String(keys[i]) + end, 'g'), function(match, behind) {
@@ -67,34 +77,38 @@ function template(str, data, options) {
  * @return String         The cleaned string.
  */
 template.clean = function(str, options) {
-    var options = options || {};
+  var options = options || {};
 
-    var before = options.before !== undefined ? options.before : '${';
-    var after = options.after !== undefined ? options.after : '}';
-    var escape = options.escape !== undefined ? options.escape : '\\';
-    var word = options.word !== undefined ? options.word : '[\\w,.]+';
-    var gap = options.gap !== undefined ? options.gap : '(\\s*(?:(?:and|or|,)\\s*)?)';
-    var replacement = options.replacement !== undefined ? options.replacement : '';
+  var before = options.before !== undefined ? options.before : '${';
+  var after = options.after !== undefined ? options.after : '}';
+  var escape = options.escape !== undefined ? options.escape : '\\';
+  var word = options.word !== undefined ? options.word : '[\\w,.]+';
+  var gap = options.gap !== undefined ? options.gap : '(\\s*(?:(?:and|or|,)\\s*)?)';
+  var replacement = options.replacement !== undefined ? options.replacement : '';
 
-    var begin = escape ? '(' + escapeRegExp(escape) + ')?' + escapeRegExp(before) : escapeRegExp(before);
-    var end = escapeRegExp(after);
+  cache[escape] = cache[escape] || escapeRegExp(escape);
+  cache[before] = cache[before] || escapeRegExp(before);
+  cache[after] = cache[after] || escapeRegExp(after);
 
-    str = str.replace(new RegExp(gap + begin + word + end + gap, 'g'), function(match, before, behind, after) {
-      if (behind) {
-        return match;
-      }
-      if (before && after && before.trim() === after.trim()) {
-        if (before.trim() || (before && after)) {
-          return before + replacement;
-        }
-      }
-      return replacement;
-    });
+  var begin = escape ? '(' + cache[escape] + ')?' + cache[before] : cache[before];
+  var end = cache[after];
 
-    if (escape) {
-      str = str.replace(new RegExp(escapeRegExp(escape) + escapeRegExp(before)), before);
+  str = str.replace(new RegExp(gap + begin + word + end + gap, 'g'), function(match, before, behind, after) {
+    if (behind) {
+      return match;
     }
-    return str;
+    if (before && after && before.trim() === after.trim()) {
+      if (before.trim() || (before && after)) {
+        return before + replacement;
+      }
+    }
+    return replacement;
+  });
+
+  if (escape) {
+    str = str.replace(new RegExp(escapeRegExp(escape) + escapeRegExp(before)), before);
+  }
+  return str;
 }
 
 module.exports = template;
