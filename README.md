@@ -52,4 +52,4 @@ template('My name is [:name] and I am [:age] years old.', {
 
 ### Escape char
 
-By default the escape char is `'\\'` but you can configure it using the `'espace'` option.
+By default the escape char is `'\\'` but you can configure it using the `'escape'` option.
